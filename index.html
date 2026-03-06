@@ -208,11 +208,17 @@
         .destino-image {
             height: 220px;
             position: relative;
+            cursor: zoom-in;
+            overflow: hidden;
         }
         .destino-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform 0.3s;
+        }
+        .destino-image:hover img {
+            transform: scale(1.05);
         }
         .destino-badge {
             position: absolute;
@@ -224,6 +230,7 @@
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: 700;
+            z-index: 2;
         }
         .destino-content { padding: 1.5rem; }
         .destino-content h3 {
@@ -231,6 +238,51 @@
             font-size: 1.4rem;
             color: var(--azul-profundo);
             margin-bottom: 0.5rem;
+        }
+
+        /* Lightbox */
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            cursor: zoom-out;
+        }
+        .lightbox.active {
+            display: flex;
+        }
+        .lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .lightbox-caption {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 18px;
+            background: rgba(0,0,0,0.7);
+            padding: 10px 20px;
+            border-radius: 25px;
         }
 
         /* Restaurantes */
@@ -332,8 +384,20 @@
             border-radius: 20px;
             overflow: hidden;
         }
-        .prato-image { height: 200px; }
-        .prato-image img { width: 100%; height: 100%; object-fit: cover; }
+        .prato-image { 
+            height: 200px; 
+            cursor: zoom-in;
+            overflow: hidden;
+        }
+        .prato-image img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+        .prato-image:hover img {
+            transform: scale(1.05);
+        }
         .prato-content { padding: 1.5rem; }
 
         /* Footer */
@@ -381,10 +445,21 @@
                 width: 55px;
                 height: 55px;
             }
+            .lightbox img {
+                max-width: 95%;
+                max-height: 80%;
+            }
         }
     </style>
 </head>
 <body>
+
+    <!-- Lightbox para zoom de imagens -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img src="" alt="Imagem ampliada" id="lightbox-img">
+        <div class="lightbox-caption" id="lightbox-caption"></div>
+    </div>
 
     <!-- Botão WhatsApp Flutuante -->
     <a href="https://wa.me/5527992973005?text=Olá!%20Vi%20seu%20site%20e%20gostaria%20de%20agendar%20um%20passeio%20turístico%20no%20Espírito%20Santo!" class="whatsapp-float" target="_blank" title="Chamar no WhatsApp">
@@ -438,7 +513,7 @@
         <div class="grid-3-colunas">
             <!-- Pedra Azul -->
             <div class="destino-card">
-                <div class="destino-image">
+                <div class="destino-image" onclick="openLightbox('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0d/a4/0f/ff/pousada-pedra-azul.jpg?w=1200&h=800&s=1', 'Pedra Azul - Domingos Martins')">
                     <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0d/a4/0f/ff/pousada-pedra-azul.jpg?w=900&h=500&s=1" alt="Pedra Azul">
                     <span class="destino-badge">Natureza</span>
                 </div>
@@ -451,7 +526,7 @@
 
             <!-- Convento da Penha -->
             <div class="destino-card">
-                <div class="destino-image">
+                <div class="destino-image" onclick="openLightbox('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/09/98/42/22/convento-n-s-da-penha.jpg?w=1200&h=800&s=1', 'Convento da Penha - Vila Velha')">
                     <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/09/98/42/22/convento-n-s-da-penha.jpg?w=900&h=500&s=1" alt="Convento da Penha">
                     <span class="destino-badge">Histórico</span>
                 </div>
@@ -464,7 +539,7 @@
 
             <!-- Itaúnas -->
             <div class="destino-card">
-                <div class="destino-image">
+                <div class="destino-image" onclick="openLightbox('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0c/39/5d/3f/dunas-de-itaunas.jpg?w=1200&h=800&s=1', 'Dunas de Itaúnas - Conceição da Barra')">
                     <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0c/39/5d/3f/dunas-de-itaunas.jpg?w=700&h=700&s=1" alt="Itaúnas">
                     <span class="destino-badge">Praias</span>
                 </div>
@@ -477,7 +552,7 @@
 
             <!-- Guarapari -->
             <div class="destino-card">
-                <div class="destino-image">
+                <div class="destino-image" onclick="openLightbox('https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Guarapari_-_ES._Aerial_view_of_the_city_of_Guarapari_and_its_beaches%2C_in_Esp%C3%ADrito_Santo%2C_Brazil.jpg/1280px-Guarapari_-_ES._Aerial_view_of_the_city_of_Guarapari_and_its_beaches%2C_in_Esp%C3%ADrito_Santo%2C_Brazil.jpg', 'Guarapari - Vista Aérea')">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Guarapari_-_ES._Aerial_view_of_the_city_of_Guarapari_and_its_beaches%2C_in_Esp%C3%ADrito_Santo%2C_Brazil.jpg/1280px-Guarapari_-_ES._Aerial_view_of_the_city_of_Guarapari_and_its_beaches%2C_in_Esp%C3%ADrito_Santo%2C_Brazil.jpg" alt="Guarapari">
                     <span class="destino-badge">Litoral</span>
                 </div>
@@ -490,7 +565,7 @@
 
             <!-- Praia da Costa -->
             <div class="destino-card">
-                <div class="destino-image">
+                <div class="destino-image" onclick="openLightbox('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/10/a6/7d/3a/photo3jpg.jpg?w=1200&h=800&s=1', 'Praia da Costa - Vila Velha')">
                     <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/10/a6/7d/3a/photo3jpg.jpg?w=900&h=-1&s=1" alt="Praia da Costa">
                     <span class="destino-badge">Urbana</span>
                 </div>
@@ -501,9 +576,9 @@
                 </div>
             </div>
 
-            <!-- Manguinhos -->
+            <!-- Manguinhos - NOVA IMAGEM -->
             <div class="destino-card">
-                <div class="destino-image">
+                <div class="destino-image" onclick="openLightbox('https://blogger.googleusercontent.com/img/a/AVvXsEi6Kx6Jdf5U5UoGtVaebMzSx1kb36E4Spy4iaBhA2QZ2Jdf7W-dYubFiP-Xd9Qe-tJvsCOkPuO3XLY7UX67BlJ-3RyyohBrS6jjagxXCksElwQtYvU9YusgUs51TkDr62i4EwEhpIy1xTybgYJ2ssruerSkc3T1tu12zNU53O-FrRgRvy3r6J5qMkJm2Q=s16000', 'Manguinhos - Serra')">
                     <img src="https://blogger.googleusercontent.com/img/a/AVvXsEi6Kx6Jdf5U5UoGtVaebMzSx1kb36E4Spy4iaBhA2QZ2Jdf7W-dYubFiP-Xd9Qe-tJvsCOkPuO3XLY7UX67BlJ-3RyyohBrS6jjagxXCksElwQtYvU9YusgUs51TkDr62i4EwEhpIy1xTybgYJ2ssruerSkc3T1tu12zNU53O-FrRgRvy3r6J5qMkJm2Q=s16000" alt="Manguinhos">
                     <span class="destino-badge">Quiosques</span>
                 </div>
@@ -713,7 +788,7 @@
         <h2 class="section-title" style="color: white;">Sabores Capixabas</h2>
         <div class="pratos-grid">
             <div class="prato-card">
-                <div class="prato-image">
+                <div class="prato-image" onclick="openLightbox('https://foodandroad.com/wp-content/uploads/2021/06/img-brazil-moqueca-2.jpg', 'Moqueca Capixaba')">
                     <img src="https://foodandroad.com/wp-content/uploads/2021/06/img-brazil-moqueca-2.jpg" alt="Moqueca">
                 </div>
                 <div class="prato-content">
@@ -723,7 +798,7 @@
             </div>
 
             <div class="prato-card">
-                <div class="prato-image">
+                <div class="prato-image" onclick="openLightbox('https://www.saboresajinomoto.com.br/uploads/images/recipes/torta-capixaba.jpg', 'Torta Capixaba')">
                     <img src="https://www.saboresajinomoto.com.br/uploads/images/recipes/torta-capixaba.jpg" alt="Torta">
                 </div>
                 <div class="prato-content">
@@ -733,7 +808,7 @@
             </div>
 
             <div class="prato-card">
-                <div class="prato-image">
+                <div class="prato-image" onclick="openLightbox('https://a0ea0a444b.cbaul-cdnwnd.com/4ca86055d8dfd962dd8d9b1fbe38ae34/200000992-21d3422cce/foto%2001.jpg', 'Chocolates Garoto')">
                     <img src="https://a0ea0a444b.cbaul-cdnwnd.com/4ca86055d8dfd962dd8d9b1fbe38ae34/200000992-21d3422cce/foto%2001.jpg" alt="Garoto">
                 </div>
                 <div class="prato-content">
@@ -743,7 +818,7 @@
             </div>
 
             <div class="prato-card">
-                <div class="prato-image">
+                <div class="prato-image" onclick="openLightbox('https://http2.mlstatic.com/D_NQ_NP_702018-MLB53043734947_122022-O.webp', 'Vinho Colonial')">
                     <img src="https://http2.mlstatic.com/D_NQ_NP_702018-MLB53043734947_122022-O.webp" alt="Vinho">
                 </div>
                 <div class="prato-content">
@@ -753,7 +828,7 @@
             </div>
 
             <div class="prato-card">
-                <div class="prato-image">
+                <div class="prato-image" onclick="openLightbox('https://uploads-noticias.broto.com.br/2026/01/espirito-santo-premio-queijos-artesanais-627x365.jpg', 'Queijos da Serra')">
                     <img src="https://uploads-noticias.broto.com.br/2026/01/espirito-santo-premio-queijos-artesanais-627x365.jpg" alt="Queijo">
                 </div>
                 <div class="prato-content">
@@ -763,7 +838,7 @@
             </div>
 
             <div class="prato-card">
-                <div class="prato-image">
+                <div class="prato-image" onclick="openLightbox('https://media-cdn.tripadvisor.com/media/photo-i/11/69/34/35/caranguejo-do-restaurante.jpg', 'Caranguejo')">
                     <img src="https://media-cdn.tripadvisor.com/media/photo-i/11/69/34/35/caranguejo-do-restaurante.jpg" alt="Caranguejo">
                 </div>
                 <div class="prato-content">
@@ -783,6 +858,33 @@
         </a>
         <p style="margin-top: 2rem; opacity: 0.8;">&copy; 2025 Guia Turístico ES. Todos os direitos reservados.</p>
     </footer>
+
+    <script>
+        // Lightbox functions
+        function openLightbox(src, caption) {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            const lightboxCaption = document.getElementById('lightbox-caption');
+            
+            lightboxImg.src = src;
+            lightboxCaption.textContent = caption;
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close lightbox with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeLightbox();
+            }
+        });
+    </script>
 
 </body>
 </html>
